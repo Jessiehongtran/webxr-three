@@ -33,11 +33,19 @@ const delQuestion = (questionId) => {
             .del()
 }
 
+//GET answers of a question
+const getAnsByQues = (questionID) => {
+    return db("question as q")
+            .where("q.id", questionID )
+            .join("answer as a","a.questionID", "q.id" )
+}
+
 
 module.exports = {
     addQuestion,
     getQuestions,
     editQuestion,
     getQuestionById,
-    delQuestion
+    delQuestion,
+    getAnsByQues
 }

@@ -13,7 +13,8 @@ route.get('/', async (req, res) => {
 
 //ADD answer
 route.post('/', async (req, res) => {
-    const new_answer = res.body
+    const new_answer = req.body
+    console.log(new_answer)
     try {
         const response = await answerModel.addAnswer(new_answer)
         res.status(200).json(response)

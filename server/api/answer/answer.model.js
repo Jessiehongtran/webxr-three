@@ -16,6 +16,7 @@ const addAnswer = (new_answer) => {
     return db("answer")
             .returning("id")
             .insert(new_answer)
+            .then(ids => ({ id: ids[0] }))
 }
 
 //EDIT answer

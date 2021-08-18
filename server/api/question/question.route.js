@@ -46,5 +46,16 @@ route.delete('/:questionId', async (req, res) => {
     }
 })
 
+//GET answers by question
+route.get('/:questionId/answers', async (req, res) => {
+    const { questionId } = req.params
+    try {
+        const content = await questionModel.getAnsByQues(questionId)
+        res.status(200).json(content)
+    } catch (err){
+        res.status(500).json(err.message)
+    }
+})
+
 
 module.exports = route;

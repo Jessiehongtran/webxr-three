@@ -9,6 +9,13 @@ exports.up = function(knex) {
          .references("question.id")
          .onDelete("CASCADE")
          .onUpdate("CASCADE")
+      tbl.integer("next_questionID")
+         .unsigned()
+         .notNullable()
+         .references("question.id")
+         .onDelete("CASCADE")
+         .onUpdate("CASCADE")
+
       
   })
 };

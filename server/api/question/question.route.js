@@ -56,33 +56,31 @@ route.get('/:questionId/answers', async (req, res) => {
             let curIndGroup 
             let i = 0
             while (content[i]){
-            if (curSameQues === null || content[i].question_text !== curSameQues){
-                //turn answer into array
-                content[i].answers = [
-                    {
-                        answer_text: content[i].answer_text,
-                        next_questionID: content[i].next_questionID
-                    }
-                ]
-                delete content[i].id
-                delete content[i].answer_text
-                delete content[i].next_questionID
-                curIndGroup = i
-                curSameQues = content[i].question_text
-                i += 1
-            }
-            else if (curSameQues && content[i].question_text === curSameQues){
-                //add answer to previous
-                content[curIndGroup].answers.push({
-                answer_text: content[i].answer_text,
-                next_questionID: content[i].next_questionID
-                })
-                //turn the current object to empty
-                content.splice(i, 1)
-            
-            }
-
-            
+                if (curSameQues === null || content[i].question_text !== curSameQues){
+                    //turn answer into array
+                    content[i].answers = [
+                        {
+                            answer_text: content[i].answer_text,
+                            next_questionID: content[i].next_questionID
+                        }
+                    ]
+                    delete content[i].id
+                    delete content[i].answer_text
+                    delete content[i].next_questionID
+                    curIndGroup = i
+                    curSameQues = content[i].question_text
+                    i += 1
+                }
+                else if (curSameQues && content[i].question_text === curSameQues){
+                    //add answer to previous
+                    content[curIndGroup].answers.push({
+                    answer_text: content[i].answer_text,
+                    next_questionID: content[i].next_questionID
+                    })
+                    //turn the current object to empty
+                    content.splice(i, 1)
+                
+                }
             }
         }
         res.status(200).json(content)

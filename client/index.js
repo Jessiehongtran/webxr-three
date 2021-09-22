@@ -28,11 +28,13 @@ let ques_ans = []
 
 function requestData(method, url, body, response){
     let xhr = new XMLHttpRequest();
-    xhr.open(method, url, true);
+    xhr.open(method, url);
+    // xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhr.setRequestHeader('Content-type', 'application/json');
     xhr.onreadystatechange = function (e){
         if (xhr.readyState == 4 && xhr.status == 200){
+            console.log(JSON.parse(xhr.responseText))
             if (response === "question"){
                 questions = JSON.parse(xhr.responseText)
             }
@@ -56,7 +58,7 @@ function getContent(){
     requestData('GET', 'http://localhost:3001/question', null, "question")
     setTimeout(function(){
         console.log('questions', questions)
-        if (questions.length > 0){
+        if (questions && questions.length > 0){
             for (let i in questions){
                 requestData('GET', `http://localhost:3001/question/${questions[i].id}/answers`, null, "content")
             }
@@ -146,18 +148,22 @@ function fillTable(content){
 
             let new_video = document.createElement('td')  
             let video_input =  document.createElement('input') 
-            video_input.addEventListener('onblur', (e) => postOrUpdateVideo(content[i].id, e.target.value))
+            video_input.addEventListener('blur', (e) => postOrUpdateVideo(content[i].id, e.target.value))
             new_video.appendChild(video_input)
             new_row.appendChild(new_video)
 
             let new_question = document.createElement('td')
             let ques_input =  document.createElement('input') 
-            ques_input.addEventListener('onblur', (e) => postOrUpdateQues(content[i].id, e.target.value))
+            ques_input.addEventListener('blur', (e) => postOrUpdateQues(content[i].id, e.target.value))
             new_question.appendChild(ques_input)
             new_row.appendChild(new_question)
 
+            let new_questionID = document.createElement('td')
+            new_row.appendChild(new_questionID)
+
             let new_answer = document.createElement('td')
             let answer_input = document.createElement('input')
+            answer_input.addEventListener('blur', (e) => postOrUpdateAns(content[i].id, e.target.value))
             new_answer.appendChild(answer_input)
             new_row.appendChild(new_answer)
 
@@ -165,9 +171,7 @@ function fillTable(content){
             let nextID_input = document.createElement('input')
             new_nextQuestionID.appendChild(nextID_input)
             new_row.appendChild(new_nextQuestionID)
-
-
-            answer_input.addEventListener('onblur', (e) => postOrUpdateAns(content[i].id, e.target.value, nextID_input.value)) 
+            nextID_input.addEventListener('blur', (e) => postOrUpdateAns(content[i].id, e.target.value, nextID_input.value)) 
             
 
             table.appendChild(new_row)
@@ -208,9 +212,9 @@ function fillTable(content){
 
 }
 
-function postOrUpdateVideo(id, video){
-    if (id){
-        requestData('PATCH', `http://localhost:3001/question/${id}`, { video: video }, null)
+function postOrUpdateVideo(questionId, video){
+    if (questionId){
+        requestData('PATCH', `http://localhost:3001/question/${questionId}`, { video: video }, null)
     } else {
         requestData('POST', 'http://localhost:3001/question', {
             video: video,
@@ -223,14 +227,32 @@ function postOrUpdateVideo(id, video){
     }, 2000)
 }
 
-function postOrUpdateQues(id, question){
-    if (id){
-        requestData('PATCH', `http://localhost:3001/question/${id}`, { question_text: question }, null)
-    } else {
+function postOrUpdateQues(questionId, question){
+    if (questionId === undefined){
         requestData('POST', 'http://localhost:3001/question', {
-            video: null,
             question_text: question
         }, null)
+        
+    } else {
+        requestData('PATCH', `http://localhost:3001/question/${questionId}`, { question_text: question }, null)
+    }
+    // getContent()
+    setTimeout( function(){
+        // fillTable(ques_ans)
+    }, 2000)
+}
+
+function postOrUpdateAns(questionId, answer, next_questionID){
+    if (questionId){
+        requestData('PATCH', `http://localhost:3001/answer/${questionId}`, { 
+            answer_text: answer,
+         }, null)
+    } else {
+        requestData('POST', `http://localhost:3001/answer`, { 
+            answer_text: answer,
+            questionID: questionId,
+            next_questionID: next_questionID
+         }, null)
     }
     getContent()
     setTimeout( function(){
@@ -238,28 +260,24 @@ function postOrUpdateQues(id, question){
     }, 2000)
 }
 
-function postOrUpdateAns(id, answer, next_questionID){
-    if (id){
-        requestData('POST', `http://localhost:3001/answer`, { 
-            answer_text: answer,
-            questionID: id,
-            next_questionID: next_questionID
-         }, null)
-    } 
-    getContent()
-    setTimeout( function(){
-        fillTable(ques_ans)
-    }, 2000)
-}
-
 function addVideoOrQuestion(){
-    ques_ans.push({})
+    ques_ans.push({
+        question_text: "",
+        video: "",
+        answers: [],
+        questionID: null
+    })
     fillTable(ques_ans)
 }
 
 function addAnswer(){
     //need to make sure the pre content is a full object and has answers as array first
-    ques_ans[ques_ans.length - 1].answers.push({})
+    ques_ans[ques_ans.length - 1].answers.push({
+        answer_text: "",
+        next_questionID: null
+
+    })
+    console.log(ques_ans)
     //do a post request after getting input
     fillTable(ques_ans)
 }

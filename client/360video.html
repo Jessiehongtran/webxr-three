@@ -26,7 +26,7 @@
         <a-assets>
             <video
                 id="vid"
-                src="https://yoda.blob.core.windows.net/videos/uptale360.mp4"
+                src=""
                 crossorigin="anonymous"
                 autoplay="false"
                 loop="true"
@@ -46,114 +46,159 @@
         </a-scene>
         <div style="position: fixed; color: #fff; top: 1%; left: 1%; z-index: 10">
             <a href="index.html" style="color: #fff">Home</a>
-            <div class="question">What color is the truck?</div>
-            <select onchange="updateVideo()" id="color">
-                <option value="Red" >Red</option>
+            <div class="question"></div>
+            <select onchange="updateVideo()" id="answer">
+                <!-- <option value="Red" >Red</option>
                 <option value="Green" >Green</option>
-                <option value="Blue" >Blue</option>
+                <option value="Blue" >Blue</option> -->
             </select>
         </div>
         <script>
             var vid = document.getElementById('vid');
-            const color = document.getElementById("color")
+            const answer = document.getElementById("answer")
             const question = document.getElementsByClassName("question")[0]
+            const API_URL = 'https://video-360.herokuapp.com'
 
             document.getElementById('play-button').addEventListener("click", function(e){
-            this.style.display = 'none';
-            vid.play();
+                this.style.display = 'none';
+                vid.play();
             }, false);
+
+            function getAnswersOfAQuestion(questionID){
+                let url=`${API_URL}/question/${questionID}/answers`;
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.setRequestHeader('Content-type', 'application/json');
+                xhr.onreadystatechange = function (e){
+                    if (xhr.readyState == 4 && xhr.status == 200){
+                        let response = JSON.parse(xhr.responseText)[0];
+                        console.log('answers', response)
+                        while (answer.firstChild) {
+                            answer.removeChild(answer.lastChild);
+                        }
+                        for (let i = 0; i < response.answers.length; i++){
+                            let ans = document.createElement('option')
+                            ans.value = response.answers[i].next_questionID
+                            ans.innerHTML = response.answers[i].answer_text
+                            answer.appendChild(ans)
+                        }
+                    }
+                }
+                xhr.send()
+            }
+
+            function getFirstQuestion(){
+                console.log('getting question')
+                let url=`${API_URL}/question`;
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.setRequestHeader('Content-type', 'application/json');
+                xhr.onreadystatechange = function (e){
+                    if (xhr.readyState == 4 && xhr.status == 200){
+                        let response = JSON.parse(xhr.responseText);
+                        let firstQuestion = response[0]
+                        question.innerHTML = firstQuestion.question_text
+                        vid.src = firstQuestion.video
+                        getAnswersOfAQuestion(firstQuestion.id)
+                    }
+                }
+                xhr.send()
+            }
+
+            getFirstQuestion()
+
+            
 
 
             function updateVideo(){
-                console.log(color.value)
-                if (color.value === "Red"){
+                if (answer.value === "Red"){
                     vid.src = "https://cdn.glitch.com/8935d2ed-c243-47e6-a74a-c275e93b7f20%2Fcity-4096-mp4-30fps-x264-ffmpeg.mp4?v=1580226185171"
                     vid.autoplay = true
 
                     question.innerHTML = "How do you feel?"
-                    color.options[0].innerHTML = color.options[0].value = "Good"
-                    color.options[1].innerHTML = color.options[1].value = "Okay"
-                    color.options[2].innerHTML = color.options[2].value = "Bad"
-
-                    console.log(color.options[0].value)
+                    answer.options[0].innerHTML = color.options[0].value = "Good"
+                    answer.options[1].innerHTML = color.options[1].value = "Okay"
+                    answer.options[2].innerHTML = color.options[2].value = "Bad"
                     
-                } else if (color.value === "Green"){
+                } else if (answer.value === "Green"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432761/gettyimages-1050168606-640_adpp_rqgbnt.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "What is your favorite food?"
-                    color.options[0].innerHTML = color.options[0].value = "Ramen"
-                    color.options[1].innerHTML = color.options[1].value = "Tacos"
-                    color.options[2].innerHTML = color.options[2].value = "Pizza"
+                    answer.options[0].innerHTML = color.options[0].value = "Ramen"
+                    answer.options[1].innerHTML = color.options[1].value = "Tacos"
+                    answer.options[2].innerHTML = color.options[2].value = "Pizza"
                     
-                } else if (color.value === "Blue"){
+                } else if (answer.value === "Blue"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432756/gettyimages-1093962784-640_adpp_e1im2n.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "What is your favorite ice cream flavor?"
-                    color.options[0].innerHTML = color.options[0].value = "Chocolate"
-                    color.options[1].innerHTML = color.options[1].value = "Vanilla"
-                    color.options[2].innerHTML = color.options[2].value = "Strawberry"
-                } else if (color.value === "Good"){
+                    answer.options[0].innerHTML = color.options[0].value = "Chocolate"
+                    answer.options[1].innerHTML = color.options[1].value = "Vanilla"
+                    answer.options[2].innerHTML = color.options[2].value = "Strawberry"
+                } else if (answer.value === "Good"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432721/gettyimages-1134046558-640_adpp_qjkvfl.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "Yo, that's good"
-                    color.style.display = 'none'
-                } else if (color.value === "Okay"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Okay"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432298/gettyimages-1043989404-640_adpp_fzjs5e.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "That's okay too"
-                    color.style.display = 'none'
-                } else if (color.value === "Bad"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Bad"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432748/gettyimages-1096179512-640_adpp_1_ukclen.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "Aw, we all have bad days"
-                    color.style.display = 'none'
-                } else if (color.value === "Ramen"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Ramen"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432721/gettyimages-1134046558-640_adpp_qjkvfl.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "Ramen is great!"
-                    color.style.display = 'none'
-                } else if (color.value === "Ramen"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Ramen"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432298/gettyimages-1043989404-640_adpp_fzjs5e.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "Good for you"
-                    color.style.display = 'none'
-                } else if (color.value === "Tacos"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Tacos"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432756/gettyimages-1093962784-640_adpp_e1im2n.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "YAY for tacos"
-                    color.style.display = 'none'
-                } else if (color.value === "Pizza"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Pizza"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432748/gettyimages-1096179512-640_adpp_1_ukclen.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "Go pizza!!"
-                    color.style.display = 'none'
-                } else if (color.value === "Chocolate"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Chocolate"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432298/gettyimages-1043989404-640_adpp_fzjs5e.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "Chocoto"
-                    color.style.display = 'none'
-                } else if (color.value === "Vanilla"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Vanilla"){
                     vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432748/gettyimages-1096179512-640_adpp_1_ukclen.mp4"
                     vid.autoplay = true
 
                     question.innerHTML = "Yes, plain and simple"
-                    color.style.display = 'none'
-                } else if (color.value === "Vanilla"){
+                    answer.style.display = 'none'
+                } else if (answer.value === "Vanilla"){
                     vid.src = "https://cdn.glitch.com/8935d2ed-c243-47e6-a74a-c275e93b7f20%2Fcity-4096-mp4-30fps-x264-ffmpeg.mp4?v=1580226185171"
                     vid.autoplay = true
 
                     question.innerHTML = "Really strawberry?!"
-                    color.style.display = 'none'
+                    answer.style.display = 'none'
                 } 
             }
         </script>

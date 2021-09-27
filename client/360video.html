@@ -48,9 +48,6 @@
             <a href="index.html" style="color: #fff">Home</a>
             <div class="question"></div>
             <select onchange="updateVideo()" id="answer">
-                <!-- <option value="Red" >Red</option>
-                <option value="Green" >Green</option>
-                <option value="Blue" >Blue</option> -->
             </select>
         </div>
         <script>
@@ -107,98 +104,34 @@
                 xhr.send()
             }
 
+            function getQuestionById(questionID){
+                let url=`${API_URL}/question/${questionID}/answers`;
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.setRequestHeader('Content-type', 'application/json');
+                xhr.onreadystatechange = function (e){
+                    if (xhr.readyState == 4 && xhr.status == 200){
+                        let response = JSON.parse(xhr.responseText);
+                        let thequestion = response[0]
+                        console.log('next question', thequestion)
+                        if (thequestion){
+                            question.innerHTML = thequestion.question_text
+                            vid.src = thequestion.video
+                            vid.autoplay = true
+                            getAnswersOfAQuestion(thequestion.questionID)
+                        }
+                    }
+                }
+                xhr.send()
+            }
+
             getFirstQuestion()
 
             
-
-
             function updateVideo(){
-                if (answer.value === "Red"){
-                    vid.src = "https://cdn.glitch.com/8935d2ed-c243-47e6-a74a-c275e93b7f20%2Fcity-4096-mp4-30fps-x264-ffmpeg.mp4?v=1580226185171"
-                    vid.autoplay = true
-
-                    question.innerHTML = "How do you feel?"
-                    answer.options[0].innerHTML = color.options[0].value = "Good"
-                    answer.options[1].innerHTML = color.options[1].value = "Okay"
-                    answer.options[2].innerHTML = color.options[2].value = "Bad"
-                    
-                } else if (answer.value === "Green"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432761/gettyimages-1050168606-640_adpp_rqgbnt.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "What is your favorite food?"
-                    answer.options[0].innerHTML = color.options[0].value = "Ramen"
-                    answer.options[1].innerHTML = color.options[1].value = "Tacos"
-                    answer.options[2].innerHTML = color.options[2].value = "Pizza"
-                    
-                } else if (answer.value === "Blue"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432756/gettyimages-1093962784-640_adpp_e1im2n.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "What is your favorite ice cream flavor?"
-                    answer.options[0].innerHTML = color.options[0].value = "Chocolate"
-                    answer.options[1].innerHTML = color.options[1].value = "Vanilla"
-                    answer.options[2].innerHTML = color.options[2].value = "Strawberry"
-                } else if (answer.value === "Good"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432721/gettyimages-1134046558-640_adpp_qjkvfl.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Yo, that's good"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Okay"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432298/gettyimages-1043989404-640_adpp_fzjs5e.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "That's okay too"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Bad"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432748/gettyimages-1096179512-640_adpp_1_ukclen.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Aw, we all have bad days"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Ramen"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432721/gettyimages-1134046558-640_adpp_qjkvfl.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Ramen is great!"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Ramen"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432298/gettyimages-1043989404-640_adpp_fzjs5e.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Good for you"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Tacos"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432756/gettyimages-1093962784-640_adpp_e1im2n.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "YAY for tacos"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Pizza"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432748/gettyimages-1096179512-640_adpp_1_ukclen.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Go pizza!!"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Chocolate"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432298/gettyimages-1043989404-640_adpp_fzjs5e.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Chocoto"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Vanilla"){
-                    vid.src = "https://res.cloudinary.com/dchyongyd/video/upload/v1632432748/gettyimages-1096179512-640_adpp_1_ukclen.mp4"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Yes, plain and simple"
-                    answer.style.display = 'none'
-                } else if (answer.value === "Vanilla"){
-                    vid.src = "https://cdn.glitch.com/8935d2ed-c243-47e6-a74a-c275e93b7f20%2Fcity-4096-mp4-30fps-x264-ffmpeg.mp4?v=1580226185171"
-                    vid.autoplay = true
-
-                    question.innerHTML = "Really strawberry?!"
-                    answer.style.display = 'none'
+                if (answer.value && parseInt(answer.value)){
+                    getQuestionById(parseInt(answer.value))
                 } 
             }
         </script>

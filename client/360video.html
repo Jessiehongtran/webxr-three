@@ -70,7 +70,6 @@
                 xhr.onreadystatechange = function (e){
                     if (xhr.readyState == 4 && xhr.status == 200){
                         let response = JSON.parse(xhr.responseText)[0];
-                        console.log('answers', response)
                         while (answer.firstChild) {
                             answer.removeChild(answer.lastChild);
                         }
@@ -86,7 +85,6 @@
             }
 
             function getFirstQuestion(){
-                console.log('getting question')
                 let url=`${API_URL}/question`;
                 let xhr = new XMLHttpRequest();
                 xhr.open('GET', url, true);
@@ -114,7 +112,6 @@
                     if (xhr.readyState == 4 && xhr.status == 200){
                         let response = JSON.parse(xhr.responseText);
                         let thequestion = response[0]
-                        console.log('next question', thequestion)
                         if (thequestion){
                             question.innerHTML = thequestion.question_text
                             vid.src = thequestion.video
